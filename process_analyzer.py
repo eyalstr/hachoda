@@ -1,4 +1,5 @@
-from extract_process_ids import fetch_process_ids_by_case_id
+from extract_process_ids import fetch_process_ids_by_case_id_sorted
+
 import pyodbc
 from bidi.algorithm import get_display
 import unicodedata
@@ -160,5 +161,8 @@ if __name__ == "__main__":
     case_id = int(input("Enter case id: "))
 
     # Fetch process IDs and execute SQL queries
-    process_ids = fetch_process_ids_by_case_id(case_id)
+    process_ids = fetch_process_ids_by_case_id_sorted(case_id)
     execute_sql_queries(process_ids)
+    # Your main script logic here
+    print("Execution completed. Press Enter to exit.")
+    input()  # Wait for user input before closing

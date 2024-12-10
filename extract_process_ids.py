@@ -13,10 +13,10 @@ mongo_connection_string = (
     "&connectTimeoutMS=10000&authSource=CaseManagement&authMechanism=SCRAM-SHA-1"
 )
 
-def fetch_process_ids_by_case_id(case_id, mongo_connection=mongo_connection_string, db_name="CaseManagement", collection_name="Case"):
-    """Fetch Process IDs from MongoDB for a given Case ID (_id)."""
+def fetch_process_ids_by_case_id_sorted(case_id, mongo_connection=mongo_connection_string, db_name="CaseManagement", collection_name="Case"):
+    """Fetch Process IDs from MongoDB for a given Case ID (_id), sorted by LastPublishDate."""
     print("Connecting to MongoDB...")
-    process_ids = set()  # Use a set to ensure unique Process IDs
+    process_list = []  # List to store tuples of (LastPublishDate, ProcessId)
 
     try:
         # Connect to MongoDB
@@ -27,7 +27,7 @@ def fetch_process_ids_by_case_id(case_id, mongo_connection=mongo_connection_stri
         # Fetch the case document by _id
         document = collection.find_one(
             {"_id": case_id},
-            {"Requests.Processes.ProcessId": 1, "_id": 1}  # Fetch only the relevant fields
+            {"Requests.Processes.ProcessId": 1, "Requests.Processes.LastPublishDate": 1, "_id": 1}
         )
 
         if not document:
@@ -42,13 +42,19 @@ def fetch_process_ids_by_case_id(case_id, mongo_connection=mongo_connection_stri
             processes = request.get("Processes", [])
             for process in processes:
                 process_id = process.get("ProcessId")
-                if process_id:
-                    process_ids.add(process_id)  # Add ProcessId to the set
+                last_publish_date = process.get("LastPublishDate")
+                if process_id and last_publish_date:
+                    # Append tuple of (LastPublishDate, ProcessId)
+                    process_list.append((last_publish_date, process_id))
 
-        # Convert set to list for output
-        process_ids = list(process_ids)
-        print(f"Extracted Process IDs for Case ID {case_id}: {process_ids}")
-        return process_ids
+        # Sort the list by LastPublishDate (ascending order)
+        process_list.sort(key=lambda x: x[0])
+
+        # Extract only ProcessId values from the sorted list
+        sorted_process_ids = [process[1] for process in process_list]
+
+        print(f"Sorted Process IDs for Case ID {case_id}: {sorted_process_ids}")
+        return sorted_process_ids
 
     except Exception as e:
         print(f"Error querying MongoDB: {e}")
@@ -62,5 +68,5 @@ def fetch_process_ids_by_case_id(case_id, mongo_connection=mongo_connection_stri
 # Test Execution
 if __name__ == "__main__":
     case_id = int(input("Enter Case ID (_id): "))
-    process_ids = fetch_process_ids_by_case_id(case_id)
-    print(f"Fetched Process IDs: {process_ids}")
+    process_ids = fetch_process_ids_by_case_id_sorted(case_id)
+    print(f"Fetched and Sorted Process IDs: {process_ids}")
