@@ -50,14 +50,15 @@ def execute_sql_queries(process_ids):
         cursor = connection.cursor()
         print("Connection to SQL Server established successfully.")
 
+        query_2_counter = 0  # Counter for the second query
+
         for process_id in process_ids:
             print(f"\nQuerying SQL for ProcessId: {process_id}")
 
             # SQL Query 1
             sql_query_1 = """
             SELECT TOP (1000) p.[ProcessID],
-                   pt.[ProcessTypeName],
-                   p.[LdapLeafID]
+                   pt.[ProcessTypeName]
             FROM [BPM].[dbo].[Processes] AS p
             JOIN [BPM].[dbo].[ProcessTypes] AS pt
                 ON pt.[ProcessTypeID] = p.[ProcessTypeID]
@@ -74,8 +75,9 @@ def execute_sql_queries(process_ids):
                 for row in rows_1:
                     print(f"  ProcessID = {row[0]}")
                     print(f"  ProcessTypeName = {BOLD_YELLOW}{normalize_hebrew(row[1])}{RESET}")
-                    print(f"  LdapLeafID = {row[2]}")
 
+            # Increment and print counter for the second query
+        
             # SQL Query 2
             sql_query_2 = """
             SELECT TOP (1000) ps.[ProcessStepID],
@@ -99,15 +101,19 @@ def execute_sql_queries(process_ids):
             """
             cursor.execute(sql_query_2, process_id)
             rows_2 = cursor.fetchall()
-           
+
             if not rows_2:
                 print(f"No results found for the second query for ProcessID {process_id}.")
                 continue
 
             print(f"Results from the second query (Fetched {len(rows_2)} rows):")
             for row in rows_2:
+
+                query_2_counter += 1
+                print(f"\n/************************  {BOLD_RED}{query_2_counter} :{normalize_hebrew('משימה')}{RESET}  **************************/")
+
                 try:
-                    process_step_id = row[0]  # Ensure this is numeric
+                    process_step_id = row[0]
                     print(f"  ProcessStepID = {row[0]}")
                     print(f"  ProcessID = {row[1]}")
                     print(f"  ProcessTypeName = {BOLD_GREEN}{normalize_hebrew(row[2])}{RESET}")
@@ -154,6 +160,7 @@ def execute_sql_queries(process_ids):
         if 'connection' in locals():
             connection.close()
             print("SQL Server connection closed.")
+
 
 # Main Execution
 if __name__ == "__main__":
