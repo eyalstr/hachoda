@@ -4,14 +4,8 @@ import os
 
 # Load environment variables from the .env file
 load_dotenv()
-
-# MongoDB connection string
-mongo_connection_string = (
-    "mongodb://eCourtUser:eCourtUserQA@10.100.216.21:27017,"
-    "10.100.216.25:27017,10.100.216.27:27017/CaseManagement"
-    "?retryWrites=true&loadBalanced=false&readPreference=secondary"
-    "&connectTimeoutMS=10000&authSource=CaseManagement&authMechanism=SCRAM-SHA-1"
-)
+# MongoDB connection string from environment variables
+mongo_connection_string = os.getenv("MONGO_CONNECTION_STRING", "")
 
 def fetch_process_ids_by_case_id_sorted(case_id, mongo_connection=mongo_connection_string, db_name="CaseManagement", collection_name="Case"):
     """Fetch Process IDs from MongoDB for a given Case ID (_id), sorted by LastPublishDate."""
