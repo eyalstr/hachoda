@@ -110,7 +110,7 @@ def execute_sql_queries(process_ids):
             for row in rows_2:
 
                 query_2_counter += 1
-                print(f"\n/************************  {BOLD_RED}{query_2_counter} :{normalize_hebrew('משימה')}{RESET}  **************************/")
+                print(f"\n/************************  {BOLD_RED}{query_2_counter} :{normalize_hebrew('פעילות')}{RESET}  **************************/")
 
                 try:
                     process_step_id = row[0]
