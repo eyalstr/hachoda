@@ -192,7 +192,7 @@ def execute_sql_queries(process_ids):
     finally:
         if 'connection' in locals():
             connection.close()
-            log_and_print("SQL Server connection closed.", "info", BOLD_GREEN)
+            log_and_print("  SQL Server connection closed.", "info", BOLD_GREEN)
 
 # Main Execution
 if __name__ == "__main__":
@@ -200,5 +200,5 @@ if __name__ == "__main__":
     case_id = int(input("Enter case id: "))
     process_ids = fetch_process_ids_by_case_id_sorted(case_id)
     execute_sql_queries(process_ids)
-    log_and_print("Execution completed. Press Enter to exit.", "info", BOLD_GREEN)
+    log_and_print("  Execution completed. Press Enter to exit.", "info", BOLD_GREEN)
     input()  # Wait for user input before closing
