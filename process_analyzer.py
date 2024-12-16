@@ -148,10 +148,12 @@ def execute_sql_queries(process_ids):
 
             log_and_print(f"  Results from query (Fetched {len(rows_2)} rows):", "info", BOLD_GREEN)
             for row in rows_2:
-                query_2_counter += 1
-                #log_and_print(f"\n/************************  {query_2_counter} : {normalize_hebrew('פעילות')}  **************************/", "info", BOLD_RED)
-                log_and_print(f"\n/***********************************   {query_2_counter}   **********************************/", "info", BOLD_RED)
-                log_and_print(f"\n/*****************************************************************************/", "info", BOLD_RED)
+                query_2_counter += 1   
+
+                log_and_print(f"\n********* Step={query_2_counter} *************\n", "info", BOLD_GREEN, is_hebrew=True)            
+                #log_and_print(f"*******************************  {query_2_counter} : {normalize_hebrew('שלב')}", "info", BOLD_RED,is_hebrew=True)
+                #log_and_print(f"\n/***********************************   {query_2_counter}   **********************************/", "info", BOLD_RED)
+                #log_and_print(f"\n/*****************************************************************************/", "info", BOLD_RED)
              
                 try:
                     process_step_id = row[0]
@@ -192,6 +194,7 @@ def execute_sql_queries(process_ids):
     finally:
         if 'connection' in locals():
             connection.close()
+            log_and_print("\n")  
             log_and_print("  SQL Server connection closed.", "info", BOLD_GREEN)
 
 # Main Execution
