@@ -5,6 +5,7 @@ from bidi.algorithm import get_display
 import unicodedata
 import os
 from colorama import init, Fore, Style
+from document_type_mapping import DOCUMENT_TYPE_MAPPING  # Import the mapping table
 
 # Initialize colorama for Windows console ANSI escape code support
 init(autoreset=True)
@@ -28,12 +29,17 @@ def normalize_hebrew(text):
 def display_document_with_highlights(doc):
     """
     Display document fields with special handling for Hebrew text in specific keys.
-    Highlights certain fields with ANSI colors.
+    Highlights certain fields with ANSI colors and applies proper RTL normalization.
     """
     print("\n" + BOLD_RED + "Document Found:" + RESET)
     for key, value in doc.items():
+        # Special case for DocumentTypeId: Lookup description and normalize Hebrew
+        if key == "DocumentTypeId" and isinstance(value, int):
+            description = DOCUMENT_TYPE_MAPPING.get(value, f"Unknown ({value})")
+            #normalized_description = normalize_hebrew(description)
+            print(f"{BOLD_YELLOW}{key}{RESET} = {BOLD_GREEN}{description}({value}){RESET}")
         # Check for Hebrew text in FileName and apply normalization
-        if key == "FileName" and isinstance(value, str):
+        elif key == "FileName" and isinstance(value, str):
             normalized_value = normalize_hebrew(value)
             print(f"{BOLD_YELLOW}{key}{RESET} = {BOLD_GREEN}{normalized_value}{RESET}")
         # Handle nested fields (optional formatting for clarity)
