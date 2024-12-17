@@ -6,6 +6,7 @@ import unicodedata
 import os
 from colorama import init, Fore, Style
 from document_type_mapping import DOCUMENT_TYPE_MAPPING  # Import the mapping table
+from document_category_mapping import DOCUMENT_CATEGORY_MAPPING
 
 # Initialize colorama for Windows console ANSI escape code support
 init(autoreset=True)
@@ -36,23 +37,29 @@ def display_document_with_highlights(doc):
         # Special case for DocumentTypeId: Lookup description and normalize Hebrew
         if key == "DocumentTypeId" and isinstance(value, int):
             description = DOCUMENT_TYPE_MAPPING.get(value, f"Unknown ({value})")
-            #normalized_description = normalize_hebrew(description)
             print(f"{BOLD_YELLOW}{key}{RESET} = {BOLD_GREEN}{description}({value}){RESET}")
-        # Check for Hebrew text in FileName and apply normalization
+
+        # Special case for DocumentCategoryId
+        elif key == "DocumentCategoryId" and isinstance(value, int):
+            description = DOCUMENT_CATEGORY_MAPPING.get(value, f"Unknown ({value})")
+            print(f"{BOLD_YELLOW}{key}{RESET} = {BOLD_GREEN}{description}({value}){RESET}")
+
+        # Check for Hebrew text in FileName
         elif key == "FileName" and isinstance(value, str):
             normalized_value = normalize_hebrew(value)
             print(f"{BOLD_YELLOW}{key}{RESET} = {BOLD_GREEN}{normalized_value}{RESET}")
+
         # Handle nested fields (optional formatting for clarity)
         elif isinstance(value, list) or isinstance(value, dict):
             print(f"{BOLD_YELLOW}{key}{RESET} =")
-            pprint(value)  # Pretty print for nested values
+            pprint(value)
         else:
             print(f"{BOLD_YELLOW}{key}{RESET} = {value}")
 
 def fetch_documents_by_case_id(case_id, mongo_connection=mongo_connection_string, db_name="CaseManagement", collection_name="Document"):
     """
     Fetch all documents from MongoDB where Entities array contains an object 
-    with EntityTypeId=1 and EntityValue=case_id.
+    with EntityTypeId=1 and EntityValue=case_id. Results are sorted by DocumentReceiptTime in descending order.
     """
     print("Connecting to MongoDB...")
     try:
@@ -71,9 +78,9 @@ def fetch_documents_by_case_id(case_id, mongo_connection=mongo_connection_string
             }
         }
 
-        # Fetch all matching documents
+        # Fetch all matching documents, sorted by DocumentReceiptTime in descending order
         print(f"Querying documents for EntityValue (case_id): {case_id}")
-        documents = collection.find(query)
+        documents = collection.find(query).sort("DocumentReceiptTime", -1)  # Sort descending
 
         matching_documents = list(documents)  # Convert cursor to list
 
@@ -94,6 +101,7 @@ def fetch_documents_by_case_id(case_id, mongo_connection=mongo_connection_string
         if 'mongo_client' in locals():
             mongo_client.close()
             print("MongoDB connection closed.")
+
 
 
 # Main Execution
