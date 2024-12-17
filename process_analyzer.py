@@ -151,10 +151,7 @@ def execute_sql_queries(process_ids):
                 query_2_counter += 1   
 
                 log_and_print(f"\n********* Step={query_2_counter} *************\n", "info", BOLD_GREEN, is_hebrew=True)            
-                #log_and_print(f"*******************************  {query_2_counter} : {normalize_hebrew('שלב')}", "info", BOLD_RED,is_hebrew=True)
-                #log_and_print(f"\n/***********************************   {query_2_counter}   **********************************/", "info", BOLD_RED)
-                #log_and_print(f"\n/*****************************************************************************/", "info", BOLD_RED)
-             
+                
                 try:
                     process_step_id = row[0]
                     log_and_print(f"  ProcessStepID = {row[0]}")
