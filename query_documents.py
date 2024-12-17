@@ -27,22 +27,22 @@ def normalize_hebrew(text):
         return text
     return get_display(unicodedata.normalize("NFKC", text.strip()))
 
-def display_document_with_highlights(doc):
+def display_document_with_highlights(doc, index):
     """
     Display document fields with special handling for Hebrew text in specific keys.
     Highlights certain fields with ANSI colors and applies proper RTL normalization.
     """
-    print("\n" + BOLD_RED + "Document Found:" + RESET)
+    print(f"\n{BOLD_RED}Document {index + 1} Found:{RESET}")  # Add document numbering
     for key, value in doc.items():
         # Special case for DocumentTypeId: Lookup description and normalize Hebrew
         if key == "DocumentTypeId" and isinstance(value, int):
             description = DOCUMENT_TYPE_MAPPING.get(value, f"Unknown ({value})")
-            print(f"{BOLD_YELLOW}{key}{RESET} = {BOLD_GREEN}{description}({value}){RESET}")
+            print(f"{BOLD_YELLOW}{key}{RESET} = {BOLD_GREEN}{normalize_hebrew(description)} ({value}){RESET}")
 
         # Special case for DocumentCategoryId
         elif key == "DocumentCategoryId" and isinstance(value, int):
             description = DOCUMENT_CATEGORY_MAPPING.get(value, f"Unknown ({value})")
-            print(f"{BOLD_YELLOW}{key}{RESET} = {BOLD_GREEN}{description}({value}){RESET}")
+            print(f"{BOLD_YELLOW}{key}{RESET} = {BOLD_GREEN}{normalize_hebrew(description)} ({value}){RESET}")
 
         # Check for Hebrew text in FileName
         elif key == "FileName" and isinstance(value, str):
@@ -88,8 +88,8 @@ def fetch_documents_by_case_id(case_id, mongo_connection=mongo_connection_string
             print(f"No documents found matching the case_id: {case_id}")
         else:
             print(f"\nFound {len(matching_documents)} matching documents:")
-            for document in matching_documents:
-                display_document_with_highlights(document)
+            for index, document in enumerate(matching_documents):
+                display_document_with_highlights(document, index)  # Pass index for numbering
 
         return matching_documents
 
@@ -101,8 +101,6 @@ def fetch_documents_by_case_id(case_id, mongo_connection=mongo_connection_string
         if 'mongo_client' in locals():
             mongo_client.close()
             print("MongoDB connection closed.")
-
-
 
 # Main Execution
 if __name__ == "__main__":
