@@ -19,8 +19,8 @@ username = "eyalst"
 password = "subaruB40!"
 
 # Target first and last names (normalized)
-target_first_name = normalize_hebrew_text("רינת")
-target_last_name = normalize_hebrew_text("ראובן")
+target_first_name = normalize_hebrew_text("הראל")
+target_last_name = normalize_hebrew_text("מונדני")
 
 # Function to process a single license
 def process_license(license_number):
@@ -55,4 +55,4 @@ def find_matching_lawyer(start, end):
                 print(f"Error processing License {license_number}: {e}")
 
 # Main execution
-find_matching_lawyer(20000, 60000)
+find_matching_lawyer(40000, 70000)
