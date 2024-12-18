@@ -27,12 +27,12 @@ def normalize_hebrew(text):
         return text
     return get_display(unicodedata.normalize("NFKC", text.strip()))
 
-def display_document_with_highlights(doc):
+def display_document_with_highlights(doc, number):
     """
-    Display document fields with special handling for Hebrew text in specific keys.
+    Display document fields with numbering and special handling for Hebrew text in specific keys.
     Highlights certain fields with ANSI colors and applies proper RTL normalization.
     """
-    print("\n" + BOLD_RED + "Document Found:" + RESET)
+    print(f"\n{BOLD_RED}Document #{number} Found:{RESET}")
     for key, value in doc.items():
         # Special case for DocumentTypeId: Lookup description and normalize Hebrew
         if key == "DocumentTypeId" and isinstance(value, int):
@@ -80,7 +80,7 @@ def fetch_documents_by_case_id(case_id, mongo_connection=mongo_connection_string
 
         # Fetch all matching documents, sorted by DocumentReceiptTime in descending order
         print(f"Querying documents for EntityValue (case_id): {case_id}")
-        documents = collection.find(query).sort("DocumentReceiptTime", 1)  # Sort ascending
+        documents = collection.find(query).sort("DocumentReceiptTime", -1)  # Sort descending
 
         matching_documents = list(documents)  # Convert cursor to list
 
@@ -88,8 +88,8 @@ def fetch_documents_by_case_id(case_id, mongo_connection=mongo_connection_string
             print(f"No documents found matching the case_id: {case_id}")
         else:
             print(f"\nFound {len(matching_documents)} matching documents:")
-            for document in matching_documents:
-                display_document_with_highlights(document)
+            for index, document in enumerate(matching_documents, start=1):  # Add numbering
+                display_document_with_highlights(document, index)
 
         return matching_documents
 
